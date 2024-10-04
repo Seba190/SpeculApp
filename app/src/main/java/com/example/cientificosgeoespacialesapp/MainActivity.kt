@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        // API KEY:AIzaSyB1sZJ5HZbqvutbV92ri9xxrIpZdcQojOw
          val webView: WebView = findViewById(R.id.webView)
         webView.webViewClient = WebViewClient() // Permite que la navegación ocurra en el WebView
 
