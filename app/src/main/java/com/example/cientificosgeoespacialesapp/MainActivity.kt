@@ -1,6 +1,10 @@
 package com.example.cientificosgeoespacialesapp
 
+import android.app.Activity
+import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -8,150 +12,121 @@ import androidx.core.view.WindowInsetsCompat
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.SupportMapFragment
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport
 import com.google.api.client.json.gson.GsonFactory
 import com.google.auth.http.HttpCredentialsAdapter
 import com.google.auth.oauth2.GoogleCredentials
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.ResponseBody
 import retrofit2.Call
-
+import retrofit2.Callback
+import retrofit2.Response
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.Task
+import com.google.gson.Gson
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.FileInputStream
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Color
+import android.content.Context
+import android.graphics.BitmapFactory
+import android.webkit.WebChromeClient
+import android.widget.Button
+import android.widget.ImageView
+import java.io.FileOutputStream
+import retrofit2.http.GET
+import retrofit2.http.Query
+import com.squareup.picasso.Picasso
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.common.api.GoogleApiClient
+import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets
+import com.google.api.client.json.JsonFactory
+import java.io.File
+import java.io.FileReader
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow
 
-class MainActivity : AppCompatActivity() {
+
+
+abstract class MainActivity : AppCompatActivity() {
+    private val RC_SIGN_IN = 1001
+    private lateinit var mMap: GoogleMap
+    private lateinit var signInLauncher: ActivityResultLauncher<Intent>
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var webView: WebView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        // API KEY:AIzaSyB1sZJ5HZbqvutbV92ri9xxrIpZdcQojOw
-         val webView: WebView = findViewById(R.id.webView)
-        webView.webViewClient = WebViewClient() // Permite que la navegación ocurra en el WebView
+        /*val imageView= findViewById<ImageView>(R.id.imageView)
+        Picasso.get()
+            .load(R.drawable.ndvi)
+            .resize(800, 800) // Redimensionar la imagen
+            .centerInside()// URL de la imagen o archivo local
+            .into(imageView)*/
+        webView = findViewById(R.id.webView)
+        val button1 = findViewById<Button>(R.id.button1)
+        val button2 = findViewById<Button>(R.id.button2)
 
-        // Habilita JavaScript para Felt si es necesario
+        button1.setOnClickListener {
+
+        }
+
+        button2.setOnClickListener {
+
+        }
+
+        // Configurar WebView
         val webSettings: WebSettings = webView.settings
-        webSettings.javaScriptEnabled = true
+        webSettings.javaScriptEnabled = true // Habilita JavaScript
+        webSettings.cacheMode = WebSettings.LOAD_DEFAULT // Cargar desde caché si es posible
+        webSettings.domStorageEnabled = true // Habilita el almacenamiento DOM
+        webSettings.mediaPlaybackRequiresUserGesture = false // Permite la reproducción automática
+        webSettings.setSupportMultipleWindows(true) // Soporta múltiples ventanas
+        webSettings.allowUniversalAccessFromFileURLs
+        webSettings.javaScriptCanOpenWindowsAutomatically = true
+        webSettings.setGeolocationEnabled(true)
+        webSettings.setSupportZoom(true)
+        webSettings.databaseEnabled = true
+        webSettings.domStorageEnabled = true
+        webSettings.layoutAlgorithm
 
-        // Carga la URL de Felt en el WebView
-        //webView.loadUrl("https://felt.com/map/Example-Hurricane-Sandy-Inundation-Zone-IUnrYOBaQp6atRiI9BtVsZD")
-        webView.loadUrl("https://sentinel-indiced.projects.earthengine.app/view/indicessentinel")
 
-        //val transport = GoogleNetHttpTransport.newTrustedTransport()
-        // val jsonFactory = GsonFactory.getDefaultInstance()
 
-        /* val earthEngineService = EarthEngine.Builder(transport, jsonFactory, HttpCredentialsAdapter(credentials))
-            .setApplicationName("Cientificos GeoEspaciales")
-            .build()
 
-        val imageCollection = earthEngineService.imageCollection().list()
-            .setId("MODIS/006/MOD13Q1")  // Dataset de ejemplo
-            .execute()
 
-        val images = imageCollection.images*/
+        // webSettings.userAgentString = "Your custom user agent string" // Opcional
 
-        /* val retrofit = Retrofit.Builder()
-            .baseUrl("https://code.earthengine.google.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val credentials = GoogleCredentials.fromStream(FileInputStream("app/client_secret_571528682835-1jm3u7shi8gstrj05olgi2bhkhh0i5g9.apps.googleusercontent.com.json"))
-            .createScoped(listOf("https://www.googleapis.com/auth/earthengine.readonly"))
-
-// Obtén el token de acceso
-        val token = credentials.refreshAccessToken().tokenValue
-
-        val authInterceptor = Interceptor { chain ->
-            val newRequest = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
-                .build()
-            chain.proceed(newRequest)
-        }
-
-        val client = OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
-            .build()
-
-// Agregar el cliente a Retrofit
-        val retrofitWithAuth = Retrofit.Builder()
-            .baseUrl("https://code.earthengine.google.com/")
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-    }*/
-
-        /* suspend fun fetchEarthEngineData(): GeeResponse? {
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://code.earthengine.google.com/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val response = retrofit.create(RetrofitApi::class.java)
-            .getEarthEngineData("ae9c2c3b464112d9988e5dd0c9a31d10")
-        return if (response.isSuccessful) {
-            response.body()
-        } else {
-            null
-        }
-    }*/
-     /*   val assetId = "projects/earthengine-legacy/assets/users/tu_usuario/tu_imagen"
-        fetchAssetInfo(assetId)
-
-    }
-    fun fetchAssetInfo(assetId: String) {
-
-        val credentialsPath =
-            "app/client_secret_571528682835-1jm3u7shi8gstrj05olgi2bhkhh0i5g9.apps.googleusercontent.com.json"
-
-        val credentials = GoogleCredentials.fromStream(FileInputStream(credentialsPath))
-            .createScoped(listOf("https://www.googleapis.com/auth/earthengine.readonly"))
-
-        val token = credentials.refreshAccessToken().tokenValue
-
-        val authInterceptor = Interceptor { chain ->
-            val newRequest = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
-                .build()
-            chain.proceed(newRequest)
-        }
-
-// Crear el cliente OkHttp con el interceptor de autenticación
-        val client = OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
-            .build()
-
-// Configurar Retrofit
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://code.earthengine.google.com/")
-            .client(client)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val earthEngineApi = retrofit.create(RetrofitApi::class.java)
-
-        // Realiza la llamada a la API para obtener la información del asset
-        val call = earthEngineApi.getAssetInfo(assetId)
-
-        call.enqueue(object : retrofit2.Callback<AssetInfoResponse> {
-            override fun onResponse(call: Call<AssetInfoResponse>, response: retrofit2.Response<AssetInfoResponse>) {
-                if (response.isSuccessful) {
-                    // Procesa la respuesta de éxito
-                    val assetInfo = response.body()
-                    if (assetInfo != null) {
-                        // Hacer algo con assetInfo
-                        println("Asset Name: ${assetInfo.name}")
-                    }
-                } else {
-                    // Manejar error de API
-                    println("Error: ${response.errorBody()?.string()}")
-                }
-            }
-
-            override fun onFailure(call: Call<AssetInfoResponse>, t: Throwable) {
-                // Manejar error de red o falla de la solicitud
-                println("Failed to fetch asset info: ${t.message}")
-            }
-        })*/
+        webView.webChromeClient = WebChromeClient()
+        val desktopUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+        webSettings.userAgentString = desktopUserAgent
+        // Cargar la URL de tu Google Earth Engine App modificado
+        val googleEarthEngineAppUrl = "https://sentinel-indiced.projects.earthengine.app/view/ndvi"
+        webView.loadUrl(googleEarthEngineAppUrl)
     }
 }
+
+
+
+
+
+
+
+

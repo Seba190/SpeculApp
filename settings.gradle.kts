@@ -20,5 +20,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "CientificosGeoespacialesApp"
-include(":app")
+include (":app")
  

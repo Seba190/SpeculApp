@@ -58,6 +58,12 @@ dependencies {
     implementation(libs.google.api.client)
     implementation(libs.google.api.client.gson)
 
+    implementation(libs.maps)
+    implementation(libs.location)
+    implementation(libs.picasso)
+    implementation(libs.google.http.client.gson)
+    implementation(libs.gax)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

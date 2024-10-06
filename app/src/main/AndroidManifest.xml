@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CientificosGeoespacialesApp"
         tools:targetApi="31">
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyB1sZJ5HZbqvutbV92ri9xxrIpZdcQojOw"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

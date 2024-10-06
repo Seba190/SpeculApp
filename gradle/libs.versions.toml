@@ -15,8 +15,11 @@ gson = "2.9.0"
 google-api-client = "1.33.0"
 google-api-client-gson = "1.33.0"
 google-auth2 = "1.13.0"
-
-
+play-services-maps = "18.0.2"
+play-services-location = "21.0.1"
+picasso = "2.8"
+gax = "1.64.0"
+google-http-client-gson = "1.39.2"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 felt = { module = "com.felt.sdk:felt", version.ref = "felt" }
@@ -31,10 +34,17 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 retrofit-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "gson" }
 google-auth = { module = "com.google.android.gms:play-services-auth", version = "21.2.0" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version = "23.0.0" }
+picasso = { module = "com.squareup.picasso:picasso", version = { ref = "picasso" } }
+gax = { module = "com.google.api:gax", version.ref = "gax" }
+google-http-client-gson = { module = "com.google.http-client:google-http-client-gson", version.ref = "google-http-client-gson" }
+
 
 google-auth2 = { module = "com.google.auth:google-auth-library-oauth2-http", version.ref = "google-auth2" }
 google-api-client = { module = "com.google.api-client:google-api-client", version.ref = "google-api-client" }
 google-api-client-gson = { module = "com.google.api-client:google-api-client-gson", version.ref = "google-api-client-gson" }
+
+maps = { module = "com.google.android.gms:play-services-maps", version.ref = "play-services-maps" }
+location = { module = "com.google.android.gms:play-services-location", version.ref = "play-services-location" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
